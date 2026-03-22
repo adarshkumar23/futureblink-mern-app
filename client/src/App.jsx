@@ -7,7 +7,7 @@ import InputNode from './nodes/InputNode';
 import ResultNode from './nodes/ResultNode';
 import Sidebar from './Sidebar';
 import './App.css';
-
+import BACKEND_URL from './config';
 const nodeTypes = {
   inputNode: InputNode,
   resultNode: ResultNode,
@@ -16,6 +16,7 @@ const nodeTypes = {
 const initialEdges = [
   { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#6366F1', strokeWidth: 2 } }
 ];
+
 
 export default function App() {
   const [prompt, setPrompt] = useState('');
@@ -48,7 +49,7 @@ export default function App() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get('/api/history');
+      const res = await axios.get(`${BACKEND_URL}/api/history`);
       setHistory(res.data.history);
     } catch (err) {
       console.error('Failed to fetch history');
@@ -60,7 +61,7 @@ export default function App() {
     setLoading(true);
     setNodes(getNodes(prompt, '', true));
     try {
-      const res = await axios.post('/api/ask-ai', { prompt });
+      const res = await axios.post(`${BACKEND_URL}/api/ask-ai`, { prompt });
       const aiResponse = res.data.response;
       setResponse(aiResponse);
       setNodes(getNodes(prompt, aiResponse, false));
@@ -76,7 +77,7 @@ export default function App() {
     if (!prompt || !response) return toast.error('Run the flow first!');
     setSaving(true);
     try {
-      await axios.post('/api/save', { prompt, response });
+      await axios.post(`${BACKEND_URL}/api/save`, { prompt, response });
       toast.success('Saved to MongoDB!');
       fetchHistory();
     } catch (err) {
